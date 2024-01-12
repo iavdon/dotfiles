@@ -1,11 +1,12 @@
 ;;; init.el --- Emacs configuration main script
+;;;
 ;;; Commentary:
 ;;
 ;;  #    #     ###################################################################
 ;;      # #    Ivan Avdonin's (ia, ia93main@gmail.com) personal configuration file
 ;;  #  #   #   ###################################################################
-;;  #  #####   init.el                 : this file, main config script for Emacs
-;;  #  #   #   early-init.el           : supplemental script Emacs runs before init.el
+;;  #  #   #   init.el                 : this file, main config script for Emacs
+;;  #  #####   early-init.el           : supplemental script Emacs runs before init.el
 ;;  #  #   #   scripts/elpaca-setup.el : elpaca dedicated initialization script
 ;;  #  #   #   scripts/buffer-move.el  : 3rd party helper functions for moving buffers
 ;;
@@ -15,7 +16,7 @@
       user-mail-address "ia93main@gmail.com")
 
 ;; Set various minor settings here and there
-;; safe to touch before elpaca is initialized (elpaca-setup)
+;; safe to touch before elpaca is initialized
 (setq inhibit-startup-screen t)                              ; skip that useless startup screen
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ; show initially maximized
 (menu-bar-mode -1)
@@ -46,6 +47,8 @@
       version-control t)                                    ; use versioned backups
 (setq auto-save-file-name-transforms
       `((".*" "~/.emacs.d/saves/" t)))
+
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode)) ; treat .h files as C++ code rather than plain C code.
 
 ;; Codepage preferences
 (prefer-coding-system 'utf-8-unix)
@@ -137,7 +140,7 @@
 
   (ia/leader-keys
     ;; Evaluating EL code
-    "e" '(:ignore t :wk "Evaluate")    
+    "e" '(:ignore t :wk "Evaluate")
     "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
     "e d" '(eval-defun :wk "Evaluate defun containing or after point")
     "e e" '(eval-expression :wk "Evaluate and elisp expression")
@@ -218,14 +221,16 @@
   ;;   "g t" '(git-timemachine :wk "Git time machine")
   ;;   "g u" '(magit-stage-file :wk "Git unstage file"))
 
-;; Zooming in & out
+;; Zooming in/out
+;; by both keyboard
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
+;; and by mouse wheel
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
 ;;
-;; UI enhancements and settings
+;; Various features & enhancements
 ;;
 (use-package doom-themes
   :ensure t
@@ -235,10 +240,6 @@
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
   ;; Global theme selection:
   (load-theme 'doom-dracula t)
-  ;;(load-theme 'doom-one t)
-  ;;(load-theme 'doom-1337 t)
-  ;;(load-theme 'doom-ir-black t)
-  ;;(load-theme 'doom-homage-black t)
   
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -270,6 +271,7 @@
   :config
   (setq neo-smart-open t
         neo-show-hidden-files t
+	neo-window-position 'right
         neo-window-width 25
         neo-window-fixed-size nil
         inhibit-compacting-font-caches t
@@ -381,16 +383,14 @@
   (counsel-mode)
   (setq ivy-initial-inputs-alist nil)) ; removes starting ^ regex in M-x
 
-;;
-;; Coding
-;;
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode)) ; treat .h files as C++ code rather than plain C code.
-
 (use-package yasnippet
   :config (yas-global-mode))
 (use-package yasnippet-snippets)
 (use-package ivy-yasnippet)
 
+;;
+;; Language Server Protocol support
+;;
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :hook (c-mode-hook . lsp)
